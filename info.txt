@@ -1,0 +1,443 @@
+Endava growthspace - knowledge sharing.
+Who can access? - only employees of Endava.
+What can we do as Endavans? - upload courses, to be enrolled.
+How we store them? - all info we store in the file with type .md.
+How we store photos/video? - in the same file .md increapted in the base64 /for the feature - links to video.
+Structure: 
+Courses
+├─ Course A
+│  ├─ Module 1 (complexity, order)
+│  ├─ Module 2 (complexity, order)
+│  └─ Module N (complexity, order)
+├─ Course B
+│  ├─ Module 1 (complexity, order)
+│  └─ Module N (complexity, order)
+└─ Course N
+   ├─ Module 1 (complexity, order)
+   └─ Module N (complexity, order)
+
+Notes*: All modules can have they type complexity and ordered sequence.
+
+Acceses to the course: - Creator can U AND D
+                       - Contributers only R unlimited
+                       - Other people only R            
+Therefore: Only Endavans have access.
+
+Information about course has only names of the modules without any context,
+only enrolled employees can access full Information.
+
+No restrication, you can be enrolled in any other course.
+                            
+Course structure
+A course is defined by the following structure:
+
+Id
+Title
+CreatedBy (user Id)
+CreatedAt,
+UpdatedAt,
+Discipline
+Development
+DevOps
+Testing
+Application Management
+Project Management
+Description
+Difficulty
+Introductory
+Medium
+Advanced
+Contributors (list of user IDs)
+Modules (list of module IDs and titles)
+Enrollments (list of user IDs)
+
+
+Module structure
+
+Id
+Title
+CourseId
+CreatedBy (user ID)
+CreatedAt,
+UpdatedAt,
+Description,
+Content,
+Order
+
+
+Phase 1: API & Application logic
+
+Requirements:
+
+Add support for:
+
+Adding courses and modules
+Updating courses and modules
+Removing courses and modules
+Getting information about a course by ID,
+Getting information about a module by ID,
+Enroll a user to a course
+Note: The focus of Phase 1 is to build a RESTful API and to have the logic underneath for handling the capabilities mentioned above. You can use an in-memory collection for now, as the integration with an SQL database is part of the 2nd phase of development.
+
+Courses and modules be must be created and updated independently. Once a course is created, a corresponding module can be added to the course. Do not add the course along with its modules as part of a single request.
+
+A course is removed along with all of its corresponding modules.
+
+The endpoint for getting information about a course must return the following items:
+
+Course details,
+The list of module titles and their ids (Do not include modules' content as part of course info).
+Recommendation: As there will be no authentication and authorization mechanism in place for the first phase, you can simulate that a user id is sent within the request. You can hardcode this ID in controller for now. You can simulate a dump authentication service which will return a random name by user id. You will need this for displaying the course's Enrollments (user id and name) and for a smoother integration with a real authentication service, which is part of the 3rd phase of development. 
+
+You should not have any user entity saved in the database (at least for now).
+
+Please, keep REST principles in mind when designing the API interface.
+
+
+
+Phase 2: Connect to a relational database
+
+At this stage we will have to configure and connect the existing application with a database, using entity framework core.
+ 
+
+Requirements:
+
+Installation & configuration.
+​​​​​​​When you will configure DBContext, all configurations should be moved in one separate class and injected in program.cs.
+
+The connection string of db have to be located in appsettings.json file.
+
+Avoid using "new DBContext()" in code, better will be to implement DI and use DBContext via an interface.
+
+Configure relationships between domain entities.
+​​​​​​​Each domain entity must have a separate class where it will have all the necessary configurations (relationships, validations). You can use the IEntityTypeConfiguration interface.
+
+Configure domain validation using Fluent Api.
+​​​​​​​Use the domain configuration classes to define database validations (the same classes created in the 2nd requirement).
+
+Apply domain changes using migrations.
+​​​​​​​Data manipulation.
+Implement CRUD Actions (create, read, update, delete) for existing application logic (Phase 1).
+
+Phase 3: Add Authentication and Authorization
+
+Add user registration into your WEB-API application
+You can use Identity framework (SignInManager/UserManager classes)
+User should be able to register
+Restrict the access for the other endpoints for users who are not authenticated using Authorize or AllowAnonymous attributes.
+Add roles to your application: 
+User (default)
+
+Admin
+
+Administrator (optional)
+
+Configure the JWT Token:
+Install Microsoft.AspNetCore.Authentication.JwtBearer package
+Add user ID and user roles into the payload of the token (you can add more data if you want/need)
+The token settings should be stored in the appsettings.json file
+Add Authentication to your application:
+Users should be able to authenticate (Get the JWT token)
+Users should be able to access restricted endpoints when authenticated (endpoints/controllers with Authorize attribute)
+Add Authorization to your application
+Admins can delete courses/modules even if they are not the owners
+Add an endpoint that refreshes the access token
+Accepts expired token as payload and creates a new one. The token should be verified if it's not forged
+Test your token anti-forgery functionality by forging/modifying a token yourself using this website: jwt.io
+
+Do not use magic strings.
+
+Quality features
+
+Create a static class for retrieving the user data in a structured way
+
+It has extension methods used to retrieve user data from HttpContext.User object. The object should contain data after authentication middleware
+
+Create GetUserDetails method to retrieve all the data that the access token contains. For example userId, roles and other added data.   
+
+The user data class may also contain get properties like IsAdmin/IsAdministrator 
+
+If claim-based authorization, add method HasClaim(string claimKey, string claimValue) and/or HasPermission(string permissionName). HasPermission() will verify if user contains claim of type “permission” with a specific value. 
+
+Optional tasks (gain experience and practice):
+
+Simulate administrator permissions for a specific user (use claim-based authorization, either binded to the role or the user)
+Add custom authorization requirement and handler (Not RoleRequirement. As suggestion - user must be an adult)
+Add an authorization policy with multiple requirements (Be admin and be above 18 years old)
+Configure Swagger's security scheme and requirement to support JWT token bearer
+Administrators can assign other users as admins
+Endpoint accessible only to users with administrator role/claim
+
+Users with administrator permissions are added in the DB using database seeding or manually modifying the database
+
+Create and implement refresh token functionality (partial implementation is acceptable)
+Do research on the topic. Refresh tokens and access tokens have different implementations and use cases.
+
+Refresh token is retrieved alongside access token on login
+
+Refresh tokens need to be tracked in DB. This allows the system to revoke existing tokens. Identity framework creates a table for tokens “AspNetUserTokens”.
+
+Create/Refactor the refresh token endpoint. It accepts the refresh token and the access token to generate a new access token. The refresh token is verified if it's not expired, revoked or modified. 
+
+When accessing RefreshToken endpoint. Access token needs to be verified to not be forged. If the access token is forged, then revoke the refresh token that came with the request.  
+
+Admins can revoke refresh tokens (log out a specific user). Revoked refresh tokens cannot be used to retrieve a new access token.
+
+All the refresh tokens are revoked after the user changed the password. This is because users can log in using multiple devices. All refresh tokens, means all the refresh tokens that is associated with that user. We don't want to log out all users after one of them changed its password. 
+
+Add user context scoped instance (only full implementation is acceptable)
+
+Register a scoped instance named IUserContext. A scoped instance means that the instance will be created when a user makes a HttpRequest and disposed when the request is completed. The data is persisted when injected in controllers, handlers and services used to complete that request. This means that a scoped instance can be used to store user data without passing it as method parameters.
+
+Create a middleware and add it after authorization middleware. The middleware must populate the IUserContext instance with the data present in the HttpRequest.User object. Middleware will only execute for endpoints that have Authorize attribute. Check the scenario when the attribute is assigned to the controller class instead of the endpoint. 
+
+Inject the IUserContext instance where the user data such as UserId is needed.
+
+You don't have to create endpoints that execute actual code. You can create endpoints just for authorization testing. 
+
+Read the "README.md" file in the example project for some additional info. [Project] Authorization.zip
+   [HttpPost("publish")]
+    [Authorize(Policy = "CanPublish")]
+    public IActionResult CheckPublishPolicy(CancellationToken cancellationToken)
+    {
+        return Ok(new
+        {
+            Response = "Access granted"
+        });
+    }
+​
+    [HttpDelete("DeleteResource")]
+    [Authorize]
+    public IActionResult CheckDeleteResourcePolicy(CancellationToken cancellationToken)
+    {
+        var userDetails = HttpContext.User.GetUserDetails();
+​
+        if (!userDetails.Roles.Contains(Roles.Admin))
+        {
+            return Unauthorized();
+        }
+​
+        return Ok(new
+        {
+            Response = "Access granted"
+        });
+    }
+
+    Homework
+Project description
+
+Endava Growthspace is going to be an internal application meant for knowledge sharing between the employees of Endava. Endavans will use this platform to upload courses and get enrolled into existing ones, created by other people.
+
+Courses will be written in markdown format. If the course contains images or videos, they will be embedded into the markdown so that we don't have to store them on the file system or in a database. On the backend, the content of the course is treated as pure text.
+
+A course has one or more modules. A module is bounded to a single course and cannot be shared across multiple courses. The order of modules within a course matters.
+
+Example of a course-module hierarchy:
+
+Course: Introduction to .NET
+Module 1: .NET Fundamentals
+Module 2: CLR & CLI
+A course can have a single creator and an unlimited number of contributors. A contributor is another employee who contributed to the creation of the course. Only the creator can update or remove the course he created. Other users, including contributors, only have read access to the course and its modules.
+
+Employees can create courses and modules. All of them can view the information about a course, regardless if they are enrolled or not. The information about a course includes the list of corresponding module titles, without their content. Only users who are enrolled into a course can view the content of course's modules. A user can enroll himself to any course he/she desires.
+
+Course structure
+
+A course is defined by the following structure:
+
+Id
+Title
+CreatedBy (user Id)
+CreatedAt,
+UpdatedAt,
+Discipline
+Development
+DevOps
+Testing
+Application Management
+Project Management
+Description
+Difficulty
+Introductory
+Medium
+Advanced
+Contributors (list of user IDs)
+Modules (list of module IDs and titles)
+Enrollments (list of user IDs)
+Module structure
+
+Id
+Title
+CourseId
+CreatedBy (user ID)
+CreatedAt,
+UpdatedAt,
+Description,
+Content,
+Order
+Development phases
+
+The development process is split into 4 phases.
+
+Phase 1: API & Application logic
+
+Requirements:
+
+Add support for:
+
+Adding courses and modules
+Updating courses and modules
+Removing courses and modules
+Getting information about a course by ID,
+Getting information about a module by ID,
+Enroll a user to a course
+Note: The focus of Phase 1 is to build a RESTful API and to have the logic underneath for handling the capabilities mentioned above. You can use an in-memory collection for now, as the integration with an SQL database is part of the 2nd phase of development.
+
+Courses and modules be must be created and updated independently. Once a course is created, a corresponding module can be added to the course. Do not add the course along with its modules as part of a single request.
+
+A course is removed along with all of its corresponding modules.
+
+The endpoint for getting information about a course must return the following items:
+
+Course details,
+The list of module titles and their ids (Do not include modules' content as part of course info).
+Recommendation: As there will be no authentication and authorization mechanism in place for the first phase, you can simulate that a user id is sent within the request. You can hardcode this ID in controller for now. You can simulate a dump authentication service which will return a random name by user id. You will need this for displaying the course's Enrollments (user id and name) and for a smoother integration with a real authentication service, which is part of the 3rd phase of development. 
+
+You should not have any user entity saved in the database (at least for now).
+
+Please, keep REST principles in mind when designing the API interface.
+
+Phase 2: Connect to a relational database
+
+At this stage we will have to configure and connect the existing application with a database, using entity framework core.
+ 
+
+Requirements:
+
+Installation & configuration.
+​​​​​​​When you will configure DBContext, all configurations should be moved in one separate class and injected in program.cs.
+
+The connection string of db have to be located in appsettings.json file.
+
+Avoid using "new DBContext()" in code, better will be to implement DI and use DBContext via an interface.
+
+Configure relationships between domain entities.
+​​​​​​​Each domain entity must have a separate class where it will have all the necessary configurations (relationships, validations). You can use the IEntityTypeConfiguration interface.
+
+Configure domain validation using Fluent Api.
+​​​​​​​Use the domain configuration classes to define database validations (the same classes created in the 2nd requirement).
+
+Apply domain changes using migrations.
+​​​​​​​Data manipulation.
+Implement CRUD Actions (create, read, update, delete) for existing application logic (Phase 1).
+
+Phase 3: Add Authentication and Authorization
+
+Add user registration into your WEB-API application
+You can use Identity framework (SignInManager/UserManager classes)
+User should be able to register
+Restrict the access for the other endpoints for users who are not authenticated using Authorize or AllowAnonymous attributes.
+Add roles to your application: 
+User (default)
+
+Admin
+
+Administrator (optional)
+
+Configure the JWT Token:
+Install Microsoft.AspNetCore.Authentication.JwtBearer package
+Add user ID and user roles into the payload of the token (you can add more data if you want/need)
+The token settings should be stored in the appsettings.json file
+Add Authentication to your application:
+Users should be able to authenticate (Get the JWT token)
+Users should be able to access restricted endpoints when authenticated (endpoints/controllers with Authorize attribute)
+Add Authorization to your application
+Admins can delete courses/modules even if they are not the owners
+Add an endpoint that refreshes the access token
+Accepts expired token as payload and creates a new one. The token should be verified if it's not forged
+Test your token anti-forgery functionality by forging/modifying a token yourself using this website: jwt.io
+
+Do not use magic strings.
+
+Quality features
+
+Create a static class for retrieving the user data in a structured way
+
+It has extension methods used to retrieve user data from HttpContext.User object. The object should contain data after authentication middleware
+
+Create GetUserDetails method to retrieve all the data that the access token contains. For example userId, roles and other added data.   
+
+The user data class may also contain get properties like IsAdmin/IsAdministrator 
+
+If claim-based authorization, add method HasClaim(string claimKey, string claimValue) and/or HasPermission(string permissionName). HasPermission() will verify if user contains claim of type “permission” with a specific value. 
+
+Optional tasks (gain experience and practice):
+
+Simulate administrator permissions for a specific user (use claim-based authorization, either binded to the role or the user)
+Add custom authorization requirement and handler (Not RoleRequirement. As suggestion - user must be an adult)
+Add an authorization policy with multiple requirements (Be admin and be above 18 years old)
+Configure Swagger's security scheme and requirement to support JWT token bearer
+Administrators can assign other users as admins
+Endpoint accessible only to users with administrator role/claim
+
+Users with administrator permissions are added in the DB using database seeding or manually modifying the database
+
+Create and implement refresh token functionality (partial implementation is acceptable)
+Do research on the topic. Refresh tokens and access tokens have different implementations and use cases.
+
+Refresh token is retrieved alongside access token on login
+
+Refresh tokens need to be tracked in DB. This allows the system to revoke existing tokens. Identity framework creates a table for tokens “AspNetUserTokens”.
+
+Create/Refactor the refresh token endpoint. It accepts the refresh token and the access token to generate a new access token. The refresh token is verified if it's not expired, revoked or modified. 
+
+When accessing RefreshToken endpoint. Access token needs to be verified to not be forged. If the access token is forged, then revoke the refresh token that came with the request.  
+
+Admins can revoke refresh tokens (log out a specific user). Revoked refresh tokens cannot be used to retrieve a new access token.
+
+All the refresh tokens are revoked after the user changed the password. This is because users can log in using multiple devices. All refresh tokens, means all the refresh tokens that is associated with that user. We don't want to log out all users after one of them changed its password. 
+
+Add user context scoped instance (only full implementation is acceptable)
+
+Register a scoped instance named IUserContext. A scoped instance means that the instance will be created when a user makes a HttpRequest and disposed when the request is completed. The data is persisted when injected in controllers, handlers and services used to complete that request. This means that a scoped instance can be used to store user data without passing it as method parameters.
+
+Create a middleware and add it after authorization middleware. The middleware must populate the IUserContext instance with the data present in the HttpRequest.User object. Middleware will only execute for endpoints that have Authorize attribute. Check the scenario when the attribute is assigned to the controller class instead of the endpoint. 
+
+Inject the IUserContext instance where the user data such as UserId is needed.
+
+You don't have to create endpoints that execute actual code. You can create endpoints just for authorization testing. 
+
+Read the "README.md" file in the example project for some additional info. [Project] Authorization.zip
+
+​
+    [HttpPost("publish")]
+    [Authorize(Policy = "CanPublish")]
+    public IActionResult CheckPublishPolicy(CancellationToken cancellationToken)
+    {
+        return Ok(new
+        {
+            Response = "Access granted"
+        });
+    }
+​
+    [HttpDelete("DeleteResource")]
+    [Authorize]
+    public IActionResult CheckDeleteResourcePolicy(CancellationToken cancellationToken)
+    {
+        var userDetails = HttpContext.User.GetUserDetails();
+​
+        if (!userDetails.Roles.Contains(Roles.Admin))
+        {
+            return Unauthorized();
+        }
+​
+        return Ok(new
+        {
+            Response = "Access granted"
+        });
+    }
+Phase 4: Deploy to Azure
+
+Deadline: -- -- --
+
+Requirements for this phase are provided as part of Azure Cloud training session.
