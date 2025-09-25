@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSharing.API", "src\KnowledgeSharing.API\KnowledgeSharing.API.csproj", "{68A8B1A1-DD3D-4CF8-8D37-80C1EC2D3A21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSharing.Core", "src\KnowledgeSharing.Core\KnowledgeSharing.Core.csproj", "{2A254145-FAFB-4CCC-90A8-EECEACB373BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSharing.CORE", "src\KnowledgeSharing.Core\KnowledgeSharing.CORE.csproj", "{2A254145-FAFB-4CCC-90A8-EECEACB373BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeSharing.DAL", "src\KnowledgeSharing.DAL\KnowledgeSharing.DAL.csproj", "{50018447-6247-4BBE-BAD2-286100AA0A70}"
 EndProject
