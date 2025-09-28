@@ -11,3 +11,6 @@ obj/
 # Packages
 packages/
 *.nupkg
+
+# Task file.txt
+info.txt
