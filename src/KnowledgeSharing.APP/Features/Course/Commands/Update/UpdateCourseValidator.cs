@@ -1,5 +1,6 @@
 using FluentValidation;
-using KnowledgeSharing.APP.Features.Course.Commands.Update;
+
+namespace KnowledgeSharing.APP.Features.Course.Commands.Update;
 
 public class UpdateCourseValidator : AbstractValidator<UpdateCourseCommand>
 {
@@ -22,5 +23,8 @@ public class UpdateCourseValidator : AbstractValidator<UpdateCourseCommand>
         RuleFor(x => x.CourseDifficulty)
             .NotEmpty().WithMessage("Difficulty is required.")
             .IsInEnum().WithMessage("Invalid difficulty.");
+
+        RuleFor(x => x.Id)
+            .GreaterThan(0).WithMessage("Invalid course ID.");
     }
 }
