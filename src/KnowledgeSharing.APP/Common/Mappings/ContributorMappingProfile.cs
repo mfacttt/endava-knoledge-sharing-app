@@ -19,14 +19,14 @@ public sealed class ContributorMappingProfile : Profile
             .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.CourseId))
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
 
-
-
-
-        // Except name - it will handle in the handler
-        CreateMap<CourseContributor, CourseContributorDto>()
-            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
-
         CreateMap<IEnumerable<CourseContributor>, CourseContributorsDto>()
-            .ForMember(dest => dest.Contributors, opt => opt.MapFrom(src => src));   
+            .ForMember(dest => dest.Contributors, opt => opt.MapFrom(src => src));
+
+
+        CreateMap<CourseContributor, CourseContributorDto>()
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.CourseId));
+        // have or to have a name from courseContributor or a service, for now hardcoded
+        //.ForMember(dest => dest.Name, opt => opt.MapFrom(src => "Alex"));
     }
 }
