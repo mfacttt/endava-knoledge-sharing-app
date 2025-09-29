@@ -20,11 +20,10 @@ public sealed class EnrollmentMappingProfile : Profile
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
             .ForMember(dest => dest.EnrolledAt, opt => opt.Ignore());
 
-
-
-        // Except name - it will handle in the handler
         CreateMap<CourseEnrollment, CourseEnrollmentDto>()
-            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId));
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+            // have or to have a name from courseEnrollment or a service, for now hardcoded
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => "Alex")); 
 
         CreateMap<IEnumerable<CourseEnrollment>, CourseEnrollmentsDto>()
             .ForMember(dest => dest.Enrollments, opt => opt.MapFrom(src => src));
