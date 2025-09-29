@@ -4,5 +4,5 @@ namespace KnowledgeSharing.CORE.Interfaces.Persistence;
 
 public interface IModuleRepository : IBaseRepository<Module, int>
 {
-    Task<IEnumerable<Module>> GetAllByCourseIdAsync(int courseId, CancellationToken ct);
+    Task<IEnumerable<Module>> GetAllByCourseIdAsync(int courseId, int page, int pageSize, CancellationToken ct);
 }
