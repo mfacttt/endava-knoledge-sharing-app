@@ -5,30 +5,42 @@ using KnowledgeSharing.APP.Common.DTOs.Responses;
 using KnowledgeSharing.CORE.Interfaces.Persistence;
 using KnowledgeSharing.APP.Features.Course.Commands.Update;
 
-public sealed class UpdateCourseHandler(ICourseRepository courseRepository,
-                                        IMapper mapper,
-                                        IValidator<UpdateCourseCommand> validator) : IRequestHandler<UpdateCourseCommand, Response<bool>>
+public sealed class UpdateCourseHandler(IMapper mapper,IUnitOfWork unitOfWork, IValidator<UpdateCourseCommand> validator)
+                         : IRequestHandler<UpdateCourseCommand, Response<bool>>
 {
     public async Task<Response<bool>> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
     {
-        var validationResult = validator.Validate(request);
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.Errors.Select(e => new ValidationErrorDto(e.PropertyName, e.ErrorMessage, e.AttemptedValue?.ToString()));
-            return Response<bool>.Failure(errors);
-        }
+        // get user id from token
+        var guid = new Guid("00000000-0000-0000-0000-000000000001");
 
-        var course = await courseRepository.GetByIdAsync(request.Id, cancellationToken);
-
+        // check if course exists
+        var course = await unitOfWork.Courses.GetByIdAsync(request.Id, cancellationToken);
         if (course == null)
             return Response<bool>.Failure(new ValidationErrorDto("Id", "Course not found.", request.Id.ToString()));
 
+        // check if user is the creator of the course
+        if (course.CreatedBy != guid)
+            return Response<bool>.Failure(new ValidationErrorDto("Id", "You are not the creator of this course.", request.Id.ToString()));
+
+        // validate request
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+            return Response<bool>.Failure(validationResult.Errors.Select(e => new ValidationErrorDto(e.PropertyName, e.ErrorMessage, e.AttemptedValue?.ToString())).ToList());
+
+        // map 
         mapper.Map(request, course);
 
-        bool updated = await courseRepository.UpdateAsync(course, cancellationToken);
+        // update course
+        var wasUpdated = await unitOfWork.Courses.UpdateAsync(course, cancellationToken);
 
-        return updated
-            ? Response<bool>.Success(true)
-            : Response<bool>.Failure(new ValidationErrorDto("Update", "Failed to update the course.", course.Id.ToString()));
+        // check if update was successful
+        if (!wasUpdated)
+            return Response<bool>.Failure(new ValidationErrorDto("Course", "Failed to update course.", request.Id.ToString()));
+
+        // save changes
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // return success response
+        return Response<bool>.Success(true);
     }
 }
