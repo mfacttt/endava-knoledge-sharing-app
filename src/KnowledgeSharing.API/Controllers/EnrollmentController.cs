@@ -29,7 +29,7 @@ public class EnrollmentController(ISender sender) : ControllerBase
     [HttpGet("{courseId:int}/[controller]")]
     public async Task<IActionResult> GetEnrollments([FromRoute] int courseId, CancellationToken cancellationToken)
     {
-        var response = await sender.Send(new GetCourseEnrollmentsQuery(courseId), cancellationToken);
+        var response = await sender.Send(new GetEnrollmentsByCourseIdQuery(courseId), cancellationToken);
         if (!response.IsSuccess)
             return BadRequest(response.Errors);
         return Ok(response.Data);
