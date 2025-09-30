@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/courses/{courseId:int}/[controller]")]
 public class EnrollmentController(ISender sender) : ControllerBase
 {
-    [HttpPost("{courseId:int}/[controller]")]
+    [HttpPost]
     public async Task<IActionResult> Enroll([FromRoute] int courseId, CancellationToken cancellationToken, Guid userId = default)
     {
         var response = await sender.Send(new EnrollUserCommand(courseId, userId), cancellationToken);
@@ -17,7 +17,7 @@ public class EnrollmentController(ISender sender) : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{courseId:int}/[controller]")]
+    [HttpDelete]
     public async Task<IActionResult> Unenroll([FromRoute] int courseId, CancellationToken cancellationToken, Guid userId = default)
     {
         var response = await sender.Send(new UnenrollUserCommand(courseId, userId), cancellationToken);
@@ -26,7 +26,7 @@ public class EnrollmentController(ISender sender) : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{courseId:int}/[controller]")]
+    [HttpGet]
     public async Task<IActionResult> GetEnrollments([FromRoute] int courseId, CancellationToken cancellationToken)
     {
         var response = await sender.Send(new GetEnrollmentsByCourseIdQuery(courseId), cancellationToken);
