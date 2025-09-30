@@ -1,2 +1,2 @@
-namespace APP;
+namespace KnowledgeSharing.APP;
 public sealed class AssemblyMarker {}
