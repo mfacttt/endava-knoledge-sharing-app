@@ -14,16 +14,23 @@ public sealed class CourseMappingProfile : Profile
             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
             .ForMember(dest => dest.Discipline, opt => opt.MapFrom(src => src.CourseDiscipline))
-            .ForMember(dest => dest.Difficulty, opt => opt.MapFrom(src => src.CourseDifficulty));
+            .ForMember(dest => dest.Difficulty, opt => opt.MapFrom(src => src.CourseDifficulty))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
         CreateMap<UpdateCourseCommand, Course>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
             .ForMember(dest => dest.Discipline, opt => opt.MapFrom(src => src.CourseDiscipline))
-            .ForMember(dest => dest.Difficulty, opt => opt.MapFrom(src => src.CourseDifficulty));
+            .ForMember(dest => dest.Difficulty, opt => opt.MapFrom(src => src.CourseDifficulty))
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
 
-        // Exept Created - it will be mapped in the handler
+
+        CreateMap<IEnumerable<Course>, CourseInfoListDto>()
+            .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => src));
+
+
         CreateMap<Course, CourseInfoDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
@@ -32,9 +39,6 @@ public sealed class CourseMappingProfile : Profile
             .ForMember(dest => dest.Difficulty, opt => opt.MapFrom(src => src.Difficulty))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
-            .ForMember(d => d.Modules, opt => opt.MapFrom(
-                src => (src.Modules ?? Array.Empty<Module>())
-                        .OrderBy(m => m.Order)
-            ));
+            .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => "Alex"));
     }
 }
