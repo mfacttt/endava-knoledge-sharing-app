@@ -7,4 +7,5 @@ public sealed record UpdateModuleCommand(int Id,
                                         string Title,
                                         string Description,
                                         string Content,
-                                        int CourseId) : IRequest<Response<bool>>;
+                                        int CourseId,
+                                        int Order) : IRequest<Response<bool>>;
