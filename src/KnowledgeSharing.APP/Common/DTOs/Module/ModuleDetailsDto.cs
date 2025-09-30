@@ -9,6 +9,5 @@ public sealed class ModuleDetailsDto
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
     public int Order { get; init; }
-    public string CreatedBy { get; init; } = default!;
     public int CourseId { get; init; }
 }

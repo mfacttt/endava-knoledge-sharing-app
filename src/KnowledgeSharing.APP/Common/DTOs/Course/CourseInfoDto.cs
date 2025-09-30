@@ -12,5 +12,5 @@ public sealed class CourseInfoDto
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
     public string CreatedBy { get; init; } = default!;
-    public IEnumerable<ModuleHeaderDto> Modules { get; init; } = Array.Empty<ModuleHeaderDto>();
+    public List<ModuleHeaderDto> Modules { get; init; } = new();
 }
