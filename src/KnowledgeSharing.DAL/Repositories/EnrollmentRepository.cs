@@ -5,17 +5,22 @@ namespace KnowledgeSharing.DAL.Repositories;
 
 public sealed class EnrollmentRepository : ICourseEnrollmentRepository
 {
-    public Task AddUser(int courseId, Guid userId)
+    public Task<bool> EnrollUser(CourseEnrollment user, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<CourseEnrollment>> GetAll(int courseId)
+    public Task<IEnumerable<CourseEnrollment>> GetAll(int courseId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Task RemoveUser(int courseId, Guid userId)
+    public Task<bool> IsExisting(CourseEnrollment user, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> UnenrollUser(CourseEnrollment user, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
