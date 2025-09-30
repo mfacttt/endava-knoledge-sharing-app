@@ -1,8 +1,8 @@
-using KnowledgeSharing.APP.Features.CourseEnrollment.Command.Enroll;
-using KnowledgeSharing.APP.Features.CourseEnrollment.Command.Unenroll;
-using KnowledgeSharing.APP.Features.CourseEnrollment.Queries.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using KnowledgeSharing.APP.Features.CourseEnrollment.Command.Enroll;
+using KnowledgeSharing.APP.Features.CourseEnrollment.Command.Unenroll;
+using GetCourseEnrollmentsQuery = KnowledgeSharing.APP.Features.CourseEnrollment.Queries.GetAll.GetEnrollmentsByCourseIdQuery;
 
 public class ContributorController(ISender sender) : ControllerBase
 {
